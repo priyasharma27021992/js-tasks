@@ -12,3 +12,17 @@ function memo(func) {
     }
   };
 }
+
+function memoWithResolver(func, resolver = (...args) => args.join("-")) {
+  let cache = new Map();
+  return function (...args) {
+    let cacheKey = resolver(args);
+    if (cache.has(cacheKey)) {
+      return cache.get(cacheKey);
+    } else {
+      const value = func.apply(undefined, args);
+      cache[cacheKey] = value;
+      return cache[cacheKey];
+    }
+  };
+}
