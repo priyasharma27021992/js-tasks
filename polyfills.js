@@ -1,36 +1,56 @@
 function customPromise(executor) {
-  let onResolve, onReject;
   let isResolved = false,
-    isRejected = false;
-  let value, error;
+    isRejected = false,
+    isCalled = false;
+  let onResolve, onReject, value, error;
 
+  // then for the chaining, the then we attach with promise
   this.then = function (resolveCallback) {
     onResolve = resolveCallback;
-    if (isResolved) onResolve(value);
+    if (!isCalled) {
+      isCalled = true;
+      onResolve(value);
+    }
     return this;
   };
 
-  this.catch = function (rejectorCallback) {
+  //error is for the
+  this.error = function (rejectCallback) {
     onReject = rejectCallback;
-    if (isRejected) onReject(value);
+    if (!isCalled) {
+      isCalled = true;
+      onReject(error);
+    }
     return this;
   };
 
   function resolver(data) {
     isResolved = true;
     value = data;
-    if (onResolve) onResolve(data);
+    if (typeof onResolve === "function" && !isCalled) {
+      isCalled = true;
+      onResolve(value);
+    }
   }
-
-  function rejector(error) {
+  function rejector(err) {
     isRejected = true;
     error = err;
-    if (onReject) onReject(error);
+    if (typeof onReject === "function" && !isCalled) {
+      isCalled = true;
+      onReject(error);
+    }
   }
 
   try {
     executor(resolver, rejector);
   } catch (err) {
-    rejector(err);
+    console.error(err);
   }
 }
+
+//checking promise
+let myPromise = new customPromise((resolve, reject) => {
+  setTimeout(() => resolve("Success", 1000));
+});
+
+myPromise.then((data) => console.log(data));
