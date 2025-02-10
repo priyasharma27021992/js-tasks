@@ -26,3 +26,27 @@ function memoWithResolver(func, resolver = (...args) => args.join("-")) {
     }
   };
 }
+
+function coinChange(coins, amount) {
+  const cache = {};
+
+  function dp(n) {
+    if (n === 0) return 0;
+    if (n < 0) return -1;
+    if (n in cache) return cache[n];
+
+    let min = Infinity;
+
+    for (const coin of coins) {
+      const subproblem = dp(n - coin);
+
+      if (subproblem >= 0) min = Math.min(min, subproblem + 1);
+    }
+
+    cache[n] = min !== Infinity ? min : -1;
+
+    return cache[n];
+  }
+
+  return dp(amount);
+}
