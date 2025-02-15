@@ -13,3 +13,20 @@ function myPromiseAllSettled(promises) {
     });
   });
 }
+
+if (!Promise.allSettled) {
+  Promise.allSettled = function (promises) {
+    return Promise.all(
+      promises.map(function (promise) {
+        return promise.then(
+          function (value) {
+            return { status: "fulfilled", value: value };
+          },
+          function (reason) {
+            return { status: "rejected", reason: reason };
+          }
+        );
+      })
+    );
+  };
+}
