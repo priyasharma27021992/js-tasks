@@ -11,7 +11,7 @@ function throttle(func, limit) {
   };
 }
 
-// Usage example:x`
+// Usage example:
 function handleScroll() {
   console.log("Scroll event handled");
 }
